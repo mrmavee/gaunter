@@ -1,0 +1,47 @@
+services:
+  gaunter:
+    build: .
+    container_name: gaunter
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - LISTEN_ADDR=0.0.0.0:8080
+      - INTERNAL_ADDR=127.0.0.1:8081
+      - BACKEND_URL=http://backend:9000
+      # - LOGO_PATH=/etc/gaunter/your-logo.png
+    # ports:
+    #   - "127.0.0.1:8080:8080"
+    #   - "${I2P_PORT:-4567}:4567"
+    #   - "${I2P_PORT:-4567}:4567/udp"
+    volumes:
+      # - ./logo.png:/etc/gaunter/your-logo.png:ro
+      - ./tor_keys/gaunter:/var/lib/tor/hidden_service/
+      - ./config/tor/torrc:/etc/tor/torrc:ro
+      - ./i2p_keys:/var/lib/i2pd/
+      - ./config/i2p/i2pd.conf:/etc/i2pd/i2pd.conf:ro
+      - ./config/i2p/tunnels.conf:/etc/i2pd/tunnels.conf:ro
+    networks:
+      - gaunter-net
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp:noexec,nosuid,size=64m
+      - /var/log:noexec,nosuid,size=16m
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+      - CHOWN
+      - SETUID
+      - SETGID
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '2.0'
+
+networks:
+  gaunter-net:
+    driver: bridge

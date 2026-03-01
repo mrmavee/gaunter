@@ -1,0 +1,42 @@
+[graph]
+targets = []
+all-features = false
+no-default-features = false
+
+[output]
+feature-depth = 1
+
+[advisories]
+ignore = [
+    { id = "RUSTSEC-2024-0437", reason = "transitive dependency via pingora -> prometheus; metrics endpoint is not used/exposed" },
+    { id = "RUSTSEC-2025-0069", reason = "transitive dependency of pingora (daemonize is unmaintained)" },
+    { id = "RUSTSEC-2024-0388", reason = "transitive dependency of pingora (derivative is unmaintained)" },
+    { id = "RUSTSEC-2024-0436", reason = "transitive dependency of imageproc/nalgebra (paste is unmaintained)" },
+]
+
+[licenses]
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "ISC",
+    "BSD-3-Clause",
+    "BSD-2-Clause",
+    "OpenSSL",
+    "Zlib",
+    "Unicode-3.0",
+    "AGPL-3.0-only",
+    "CDLA-Permissive-2.0",
+]
+confidence-threshold = 0.8
+
+[bans]
+multiple-versions = "allow"
+wildcards = "allow"
+highlight = "all"
+workspace-default-features = "allow"
+external-default-features = "allow"
+
+[sources]
+unknown-registry = "warn"
+unknown-git = "warn"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
