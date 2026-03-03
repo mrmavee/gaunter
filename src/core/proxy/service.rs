@@ -543,6 +543,10 @@ impl ProxyHttp for GaunterProxy {
             TrackMode::GlobalAndLocal
         };
 
+        if mode == TrackMode::GlobalAndLocal && ctx.session_data.is_none() {
+            self.defense_monitor.record_unverified();
+        }
+
         self.defense_monitor
             .record_request(ctx.circuit_id.as_deref(), ctx.is_error, mode);
 

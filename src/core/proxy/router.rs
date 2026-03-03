@@ -408,10 +408,6 @@ impl WafRouter {
         if let Some(circuit) = ctx.circuit_id.as_ref() {
             trace!(circuit_id = %circuit, "Request from Tor circuit");
 
-            if ctx.session_data.is_none() {
-                self.defense_monitor.record_unverified();
-            }
-
             if self.defense_monitor.is_flooding(circuit) {
                 info!(circuit = %circuit, action = "challenge", "circuit flood: challenge required");
                 self.defense_monitor.challenge_circuit(circuit);

@@ -20,9 +20,12 @@ pub struct KarmaEntry {
     pub last_updated: AtomicU64,
 }
 
+/// Traffic tracking mode.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TrackMode {
+    /// Track both global and local metrics.
     GlobalAndLocal,
+    /// Track local metrics only.
     LocalOnly,
 }
 
@@ -434,7 +437,7 @@ impl DefenseMonitor {
         let window_start = self.attack_window_start.load(Ordering::Relaxed);
         let elapsed = now.saturating_sub(window_start).max(1);
 
-        if elapsed < 10 || (raw_requests < 10 && unverified == 0) {
+        if elapsed < 10 || raw_requests < 10 {
             return 0.0;
         }
 
@@ -463,11 +466,12 @@ impl DefenseMonitor {
         }
 
         if raw_requests > 0 {
-            let unverified_percent = unverified.saturating_mul(100) / raw_requests;
+            let capped_unverified = unverified.min(raw_requests);
+            let unverified_percent = capped_unverified.saturating_mul(100) / raw_requests;
             score = score.saturating_add((unverified_percent.saturating_mul(5)) / 100);
         }
 
-        if effective_circuits >= 5 {
+        if effective_circuits >= 5 && rps >= rps_threshold / 3 {
             let avg_req = raw_requests / effective_circuits.max(1);
             if avg_req < req_per_circ_limit {
                 let diff = req_per_circ_limit.saturating_sub(avg_req);

@@ -1,6 +1,7 @@
 mod common;
 
 use common::{base_config, base_defense, spawn_mock_backend, spawn_proxy_server};
+use gaunter::test_helpers::TrackMode;
 use reqwest::{Client, StatusCode};
 use tokio::time::{Duration, sleep};
 
@@ -62,8 +63,25 @@ fn session_blocking() {
 fn attack_score_calculation() {
     let (_config, monitor) = base_defense();
 
-    let initial = monitor.attack_score();
-    assert!(initial < 0.1);
+    assert!(monitor.attack_score() < 0.1);
+
+    for i in 0..5 {
+        monitor.record_request(Some(&format!("cid_{i}")), false, TrackMode::GlobalAndLocal);
+        monitor.record_unverified();
+    }
+
+    assert!(monitor.attack_score() < 0.1);
+
+    for i in 5..15 {
+        monitor.record_request(Some(&format!("cid_{i}")), false, TrackMode::GlobalAndLocal);
+    }
+
+    for _ in 0..100 {
+        monitor.record_unverified();
+    }
+
+    let raw = monitor.attack_score();
+    assert!(raw < 2.0);
 }
 
 #[tokio::test]
