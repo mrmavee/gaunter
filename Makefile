@@ -57,5 +57,8 @@ lint: fmt fuzz-lint deny
 report: fuzz-cmin
 	cd fuzz && ./sync_report.sh
 
+dev:
+	docker compose -f infra/compose.dev.yaml up --build
+
 fmt:
 	cargo fmt --all

@@ -1,0 +1,43 @@
+services:
+  gaunter_dev:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.dev
+      target: gaunter
+    container_name: gaunter_dev
+    restart: unless-stopped
+    env_file:
+      - .env.dev
+    environment:
+      - BACKEND_URL=http://mock_backend:9000
+    volumes:
+      - ../tor_keys/gaunter:/var/lib/tor/hidden_service/
+      - ../config/tor/torrc:/etc/tor/torrc:ro
+      - ../i2p_keys:/var/lib/i2pd/
+      - ../config/i2p/i2pd.conf:/etc/i2pd/i2pd.conf:ro
+      - ../config/i2p/tunnels.conf:/etc/i2pd/tunnels.conf:ro
+    networks:
+      - gaunter_dev_net
+    cap_add:
+      - NET_BIND_SERVICE
+      - CHOWN
+      - SETUID
+      - SETGID
+    depends_on:
+      - mock_backend
+
+  mock_backend:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.dev
+      target: mock-backend
+    container_name: mock_backend
+    restart: unless-stopped
+    networks:
+      - gaunter_dev_net
+    expose:
+      - "9000"
+
+networks:
+  gaunter_dev_net:
+    driver: bridge

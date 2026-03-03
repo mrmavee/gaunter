@@ -1,4 +1,4 @@
 /target
 /tor_keys
-.env
+**/*.env*
 i2p_keys/

@@ -167,6 +167,7 @@ jobs:
         uses: https://code.forgejo.org/docker/build-push-action@v6
         with:
           context: .
+          file: infra/Dockerfile
           push: true
           provenance: false
           tags: ${{ steps.meta.outputs.tags }}

@@ -27,7 +27,7 @@ RUN addgroup -S gaunter && adduser -S gaunter -G gaunter
 WORKDIR /app
 COPY --from=builder /app/gaunter-bin /app/gaunter
 COPY --from=builder /app/templates /app/templates
-COPY entrypoint.sh /entrypoint.sh
+COPY infra/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 RUN apk del apk-tools && rm -rf /var/cache/apk/* /lib/apk /usr/share/apk
 EXPOSE 8080 8081

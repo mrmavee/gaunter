@@ -1,3 +1,7 @@
+# Tor Configuration File (torrc)
+# Documentation: https://2019.www.torproject.org/docs/tor-manual.html.en
+# DoS Defense Docs: https://community.torproject.org/onion-services/advanced/dos/
+
 # Hidden Service Configuration
 HiddenServiceDir /var/lib/tor/hidden_service/
 
@@ -10,7 +14,9 @@ DataDirectory /var/lib/tor
 
 # Control Port for Gaunter defense mechanisms (PoW, Circuit Killing)
 ControlPort 127.0.0.1:9051
-HashedControlPassword 16:F8DE191E51A74E8460760AECD644FF92BD255544FAD9153CC93579F2AD
+# Replace with hash from 'tor --hash-password <pwd>'
+# See README.md for manual update instructions.
+HashedControlPassword 16:CC9155A8ED3E10AD600A70FB95788FFB225A379BDCE91D16C3018D7DFB
 
 # Export Circuit ID via PROXY protocol
 HiddenServiceExportCircuitID haproxy

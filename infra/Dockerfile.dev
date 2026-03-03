@@ -1,0 +1,33 @@
+FROM rust:1.92-alpine AS chef
+RUN apk add --no-cache musl-dev openssl-dev openssl-libs-static pkgconfig build-base clang git perl cmake
+RUN cargo install cargo-chef
+WORKDIR /app
+
+FROM chef AS planner
+COPY . .
+RUN cargo chef prepare --recipe-path recipe.json
+
+FROM chef AS builder
+COPY --from=planner /app/recipe.json recipe.json
+RUN cargo chef cook --recipe-path recipe.json --examples
+COPY . .
+RUN cargo build && cargo build --example mock_backend
+
+FROM alpine:3.23.3 AS gaunter
+RUN apk add --no-cache tor ca-certificates su-exec && \
+    apk add --no-cache i2pd --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community && \
+    rm -rf /usr/share/tor/geoip /usr/share/tor/geoip6
+RUN addgroup -S gaunter && adduser -S gaunter -G gaunter
+WORKDIR /app
+COPY --from=builder /app/target/debug/gaunter /app/gaunter
+COPY --from=builder /app/templates /app/templates
+COPY infra/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+EXPOSE 8080 8081
+ENTRYPOINT ["/entrypoint.sh"]
+
+FROM alpine:3.23.3 AS mock-backend
+WORKDIR /app
+COPY --from=builder /app/target/debug/examples/mock_backend /app/mock_backend
+EXPOSE 9000
+ENTRYPOINT ["/app/mock_backend"]
