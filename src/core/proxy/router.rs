@@ -244,6 +244,7 @@ impl WafRouter {
         sess: &mut EncryptedSession,
         violation_type: &str,
         karma_points: u32,
+        notify: bool,
     ) {
         match violation_type {
             "waf" => sess.waf_violations = sess.waf_violations.saturating_add(1),
@@ -288,13 +289,15 @@ impl WafRouter {
 
             self.defense_monitor.block_session(&sess.session_id);
 
-            self.webhook.notify(WebhookPayload {
-                event_type: EventType::SessionBlocked,
-                timestamp: i64::try_from(sess.blocked_at).unwrap_or(0),
-                circuit_id: ctx.circuit_id.clone(),
-                severity: 5,
-                message: sess.block_reason.clone(),
-            });
+            if notify {
+                self.webhook.notify(WebhookPayload {
+                    event_type: EventType::SessionBlocked,
+                    timestamp: i64::try_from(sess.blocked_at).unwrap_or(0),
+                    circuit_id: ctx.circuit_id.clone(),
+                    severity: 5,
+                    message: sess.block_reason.clone(),
+                });
+            }
         }
     }
 
@@ -442,7 +445,7 @@ impl WafRouter {
 
         let mut sess = Self::ensure_session(ctx);
         ctx.body_block_reason = Some(format!("Restricted: {path}"));
-        self.penalize(ctx, &mut sess, "restricted_path", karma_penalty);
+        self.penalize(ctx, &mut sess, "restricted_path", karma_penalty, !silent);
 
         ctx.session_data = Some(sess.clone());
         info!(path = %path, circuit = ?ctx.circuit_id, session = %sess.session_id, action = "restricted_path_block", "restricted path triggered");
@@ -467,7 +470,7 @@ impl WafRouter {
 
         let mut sess = Self::ensure_session(ctx);
         ctx.body_block_reason = Some(format!("Karma threshold exceeded for circuit {cid}"));
-        self.penalize(ctx, &mut sess, "restricted_path", 0);
+        self.penalize(ctx, &mut sess, "restricted_path", 0, true);
 
         info!(circuit = %cid, session = %sess.session_id, action = "karma_block", "excessive karma: block");
 
@@ -532,7 +535,7 @@ impl WafRouter {
             );
 
             ctx.is_error = true;
-            self.penalize(ctx, &mut sess, "upload", 5);
+            self.penalize(ctx, &mut sess, "upload", 5, true);
 
             if sess.upload_violations >= 10
                 && let Some(cid) = &ctx.circuit_id
@@ -568,7 +571,7 @@ impl WafRouter {
                 "rate limit exceeded"
             );
 
-            self.penalize(ctx, &mut sess, "ratelimit", 3);
+            self.penalize(ctx, &mut sess, "ratelimit", 3, true);
 
             if sess.ratelimit_violations >= 10
                 && let Some(cid) = &ctx.circuit_id
@@ -616,7 +619,7 @@ impl WafRouter {
         ctx: &mut RequestCtx,
     ) -> Result<bool> {
         let mut sess = Self::ensure_session(ctx);
-        self.penalize(ctx, &mut sess, "ratelimit", 5);
+        self.penalize(ctx, &mut sess, "ratelimit", 5, true);
         ctx.session_data = Some(sess.clone());
 
         if sess.blocked {

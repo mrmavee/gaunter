@@ -188,7 +188,7 @@ impl GaunterProxy {
                 "waf block: {}", reason
             );
 
-            self.waf_router.penalize(ctx, &mut sess, "waf", 10);
+            self.waf_router.penalize(ctx, &mut sess, "waf", 10, true);
 
             let html = ui::block_page("waf", &sess.session_id, &self.config);
             return self.waf_router.send_block(session, &sess, html, 400).await;
@@ -445,7 +445,7 @@ impl ProxyHttp for GaunterProxy {
                 "waf body block: {}", reason
             );
 
-            self.waf_router.penalize(ctx, &mut sess, "waf", 10);
+            self.waf_router.penalize(ctx, &mut sess, "waf", 10, true);
 
             let html = ui::block_page("Bad Request", &sess.session_id, &self.config);
             let _ = self.waf_router.send_block(session, &sess, html, 400).await;
