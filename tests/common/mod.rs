@@ -105,16 +105,14 @@ fn wait_for_port(addr: &str) {
 }
 
 pub fn spawn_mock_backend() -> String {
-    let listener = StdTcpListener::bind("127.0.0.1:0").unwrap();
-    let port = listener.local_addr().unwrap().port();
-    drop(listener);
-    let addr = format!("127.0.0.1:{port}");
-    let addr_cl = addr.clone();
+    let std_listener = StdTcpListener::bind("127.0.0.1:0").unwrap();
+    let addr = std_listener.local_addr().unwrap().to_string();
+    std_listener.set_nonblocking(true).unwrap();
 
     thread::spawn(move || {
         let rt = tokio::runtime::Runtime::new().unwrap();
         rt.block_on(async move {
-            let listener = TokioTcpListener::bind(&addr_cl).await.unwrap();
+            let listener = TokioTcpListener::from_std(std_listener).unwrap();
             loop {
                 if let Ok((mut socket, _)) = listener.accept().await {
                     tokio::spawn(async move {
@@ -359,6 +357,7 @@ pub fn spawn_stack_mode(
         server.run_forever();
     });
 
+    wait_for_port(&internal_addr.to_string());
     wait_for_port(&listen_str);
     (listen_str, defense)
 }
