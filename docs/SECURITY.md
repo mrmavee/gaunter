@@ -13,19 +13,20 @@ Specific advisories are ignored in `deny.toml` as the vulnerable code paths are 
 ## Fuzzing Status
 Core logic is continuously stressed using `cargo-fuzz` (libFuzzer) to ensure memory safety and zero panics.
 
-- **Corpus**: 8861 seeds (36M, minimized)
+- **Corpus**: 9276 seeds (37M, minimized)
 - **Crashes Found**: 0
-- **Last Updated**: 2026-03-02
+- **Last Updated**: 2026-03-04
 
 ### Statistics
 | Target | Coverage | Features | Corpus |
 |--------|----------|----------|--------|
-| `form_captcha` | 1123 | 3481 | 545/120Kb |
+| `form_captcha` | 1123 | 3483 | 542/117Kb |
 | `proxy_protocol` | 334 | 515 | 131/6221b |
 | `session_security` | 1238 | 3667 | 302/38Kb |
-| `waf_engine` | 7278 | 41293 | 6939/1186Kb |
+| `waf_engine` | 7280 | 41506 | 6942/1214Kb |
 | `detect_mime` | 81 | 120 | 51/1748b |
-| `waf_rule_engine` | 1401 | 6665 | 648/84Kb |
+| `waf_rule_engine` | 1408 | 6886 | 671/115Kb |
+| `hs_setconf` | 291 | 1458 | 433/109Kb |
 
 ### Target Descriptions
 - `form_captcha`: Custom `application/x-www-form-urlencoded` parser (`src/core/proxy/response.rs`) for extracting CAPTCHA tokens and solutions (`s`, `solution`, `c1-c6`).
@@ -34,3 +35,4 @@ Core logic is continuously stressed using `cargo-fuzz` (libFuzzer) to ensure mem
 - `waf_engine`: `WafEngine::scan` logic including multi-layered decoding (percent, `+`), `libinjection` integration, and custom SSRF/Path Traversal detection.
 - `waf_rule_engine`: Deep stress testing of the core `RuleEngine` across path, query, body, and cookie zones.
 - `detect_mime`: Validation of file upload magic bytes and MIME signatures to prevent upload filter bypass.
+- `hs_setconf`: Validates `torrc` configuration parsing and dynamic Hidden Service (`HS`) setup logic (`src/features/tor/control.rs`).

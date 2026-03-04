@@ -56,3 +56,10 @@ path = "fuzz_targets/detect_mime.rs"
 test = false
 doc = false
 bench = false
+
+[[bin]]
+name = "hs_setconf"
+path = "fuzz_targets/hs_setconf.rs"
+test = false
+doc = false
+bench = false

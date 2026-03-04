@@ -26,6 +26,7 @@ pub mod test_helpers {
     pub use crate::core::proxy::headers::is_static_asset;
     pub use crate::core::proxy::protocol::parse_proxy_header;
     pub use crate::core::proxy::response::parse_form;
+    pub use crate::features::tor::control::hs_setconf;
     pub use crate::security::captcha::generator::CaptchaGenerator;
     pub use crate::security::crypto::CookieCrypto;
     pub use crate::security::defense::TrackMode;
