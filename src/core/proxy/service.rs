@@ -65,10 +65,13 @@ impl GaunterProxy {
         waf_engine: Arc<WafEngine>,
     ) -> Self {
         let cookie_crypto = CookieCrypto::new(&config.session.secret);
-        let tor_control = config
-            .tor
-            .control_addr
-            .map(|addr| TorControl::new(addr, config.tor.control_password.clone()));
+        let tor_control = config.tor.control_addr.map(|addr| {
+            TorControl::new(
+                addr,
+                config.tor.control_password.clone(),
+                config.tor.torrc_path.clone(),
+            )
+        });
 
         let waf_router = WafRouter::new(crate::core::proxy::router::WafRouterDeps {
             config: Arc::clone(&config),
@@ -138,7 +141,7 @@ impl GaunterProxy {
         if let Some(tor) = &self.tor_control
             && let Some(effort) = self.defense_monitor.detect_pow_need()
         {
-            match tor.enable_pow("gaunter-service", effort).await {
+            match tor.enable_pow(effort).await {
                 Ok(()) => {
                     self.defense_monitor.enable_pow();
                     let msg = format!("pow enabled at effort {effort}");
