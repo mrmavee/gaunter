@@ -10,6 +10,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 const DEFAULT_LISTEN_ADDR_PORT: u16 = 8080;
+const DEFAULT_LISTEN_ADDR_HOST: IpAddr = IpAddr::V4(Ipv4Addr::LOCALHOST);
 const DEFAULT_INTERNAL_ADDR_PORT: u16 = 8081;
 const DEFAULT_CONCURRENCY_LIMIT: usize = 1024;
 const DEFAULT_WAF_MODE: &str = "NORMAL";
@@ -99,6 +100,15 @@ impl WafMode {
         match s.to_uppercase().as_str() {
             "DEFENSE" => Self::Defense,
             _ => Self::Normal,
+        }
+    }
+}
+
+impl std::fmt::Display for WafMode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Normal => write!(f, "Normal"),
+            Self::Defense => write!(f, "Defense"),
         }
     }
 }
@@ -210,10 +220,7 @@ pub struct NetworkSettings {
 impl Default for NetworkSettings {
     fn default() -> Self {
         Self {
-            listen_addr: SocketAddr::new(
-                IpAddr::V4(Ipv4Addr::UNSPECIFIED),
-                DEFAULT_LISTEN_ADDR_PORT,
-            ),
+            listen_addr: SocketAddr::new(DEFAULT_LISTEN_ADDR_HOST, DEFAULT_LISTEN_ADDR_PORT),
             internal_addr: SocketAddr::new(
                 IpAddr::V4(Ipv4Addr::LOCALHOST),
                 DEFAULT_INTERNAL_ADDR_PORT,

@@ -8,7 +8,7 @@ services:
     env_file:
       - ../.env
     environment:
-      - LISTEN_ADDR=0.0.0.0:8080
+      - LISTEN_ADDR=127.0.0.1:8080
       - INTERNAL_ADDR=127.0.0.1:8081
       - BACKEND_URL=http://backend:9000
       # - LOGO_PATH=/etc/gaunter/your-logo.png

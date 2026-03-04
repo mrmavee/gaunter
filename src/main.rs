@@ -83,6 +83,69 @@ fn spawn_background(
 }
 
 #[allow(clippy::print_stdout)]
+fn print_startup(config: &gaunter::Config) {
+    let sep = "─".repeat(52);
+    let app_name = if config.meta.app_name.is_empty() {
+        "Gaunter"
+    } else {
+        config.meta.app_name.as_str()
+    };
+    let captcha = if config.features.captcha_enabled {
+        format!(
+            "enabled  ({}, ttl {}s, max failures {})",
+            config.captcha.difficulty, config.captcha.ttl, config.captcha.max_failures
+        )
+    } else {
+        "disabled".to_string()
+    };
+    let tor = config
+        .tor
+        .control_addr
+        .map_or_else(|| "no control port".to_string(), |a| a.to_string());
+    let webhook = if config.features.webhook_enabled {
+        "enabled"
+    } else {
+        "disabled"
+    };
+    let body_scan = if config.features.waf_body_scan_enabled {
+        "on"
+    } else {
+        "off"
+    };
+    let i2p =
+        if std::env::var("I2P_ENABLED").is_ok_and(|v| v.eq_ignore_ascii_case("true") || v == "1") {
+            "enabled"
+        } else {
+            "disabled"
+        };
+
+    let unspecified = config.network.listen_addr.ip().is_unspecified();
+
+    println!("{sep}");
+    println!("  {app_name}");
+    println!("{sep}");
+    let in_docker = std::path::Path::new("/.dockerenv").exists();
+    if unspecified && !in_docker {
+        println!(
+            "  WARNING: listening on 0.0.0.0 binding to all interfaces. Make sure you have a strong reason for this."
+        );
+    }
+    println!(
+        "  network   {} → {}",
+        config.network.listen_addr, config.network.backend_url
+    );
+    println!(
+        "  waf       {}  |  body scan: {body_scan}",
+        config.security.waf_mode
+    );
+    println!("  captcha   {captcha}");
+    println!("  tor       {tor}");
+    println!("  i2p       {i2p}");
+    println!("  webhook   {webhook}");
+    println!("{sep}");
+}
+
+#[allow(clippy::print_stdout)]
 fn print_banner() {
     let banner = r"
  ██████╗  █████╗ ██╗   ██╗███╗   ██╗████████╗███████╗██████╗ 
@@ -107,14 +170,8 @@ fn main() {
         std::process::exit(1);
     });
     preload_templates();
-    info!(
-        listen_addr = %config.network.listen_addr,
-        internal_addr = %config.network.internal_addr,
-        backend_url = %config.network.backend_url,
-        waf_mode = ?config.security.waf_mode,
-        log_format = %config.log_format,
-        "server ready"
-    );
+    print_startup(&config);
+    info!("server ready");
 
     let rate_limiter = RateLimiter::new(
         config.defense.rate_limit_rps,
