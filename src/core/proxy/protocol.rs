@@ -416,16 +416,22 @@ async fn forward_response_body(
 
     if let Some(enc) = compress {
         let mut chunked_writer = Encoder::new(&mut *client);
-        if enc == "br" {
+        let compress_result: std::io::Result<()> = if enc == "br" {
             let mut encoder = BrotliEncoder::new(&mut chunked_writer);
-            tokio::io::copy(&mut chain, &mut encoder).await?;
-            encoder.shutdown().await?;
+            match tokio::io::copy(&mut chain, &mut encoder).await {
+                Ok(_) => encoder.shutdown().await,
+                Err(e) => Err(e),
+            }
         } else {
             let mut encoder = GzipEncoder::new(&mut chunked_writer);
-            tokio::io::copy(&mut chain, &mut encoder).await?;
-            encoder.shutdown().await?;
-        }
-        chunked_writer.shutdown().await?;
+            match tokio::io::copy(&mut chain, &mut encoder).await {
+                Ok(_) => encoder.shutdown().await,
+                Err(e) => Err(e),
+            }
+        };
+        let shutdown_result = chunked_writer.shutdown().await;
+        compress_result?;
+        shutdown_result?;
     } else if is_chunked {
         tokio::io::copy(&mut chain, client).await?;
     } else if content_length > 0 {
