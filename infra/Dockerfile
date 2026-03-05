@@ -1,6 +1,6 @@
 FROM rust:1.92-alpine AS chef
-RUN apk add --no-cache musl-dev openssl-dev openssl-libs-static pkgconfig make perl git cmake clang build-base
-RUN cargo install cargo-chef
+RUN apk add --no-cache musl-dev openssl-dev openssl-libs-static pkgconfig make perl git cmake clang build-base && \
+    cargo install cargo-chef
 WORKDIR /app
 
 FROM chef AS planner

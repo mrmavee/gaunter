@@ -3,13 +3,12 @@ target/
 .gitignore
 .env
 tor_keys/
-torrc
 i2p_keys/
 .forgejo/
 .dockerignore
 Makefile
-docker-compose.yml
-docker-compose.dev.yml
+infra/compose.yaml
+infra/compose.dev.yaml
 deny.toml
 cliff.toml
 certs/
