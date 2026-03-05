@@ -39,8 +39,8 @@ libinjectionrs = "0.1.1"
 papaya = "0.2.3"
 path-clean = "1.0.1"
 percent-encoding = "2.3.2"
-pingora = { version = "0.7.0", features = ["proxy"] }
-pingora-limits = "0.7.0"
+pingora = { version = "0.8.0", features = ["proxy"] }
+pingora-limits = "0.8.0"
 proxy-header = "0.1.2"
 rand = "0.10.0"
 regex = { version = "1.12.3", default-features = false, features = ["std", "perf", "unicode-perl", "unicode-case"] }
@@ -51,7 +51,7 @@ sha2 = "0.10.9"
 socket2 = "0.6.2"
 stem-rs = "1.2.2"
 thiserror = "2.0.18"
-tokio = { version = "1.49.0", features = ["rt-multi-thread", "net", "io-util", "time", "sync", "macros"] }
+tokio = { version = "1.50.0", features = ["rt-multi-thread", "net", "io-util", "time", "sync", "macros"] }
 tracing = "0.1.44"
 tracing-appender = "0.2.4"
 tracing-subscriber = { version = "0.3.22", default-features = false, features = ["env-filter", "json", "fmt", "ansi"] }
