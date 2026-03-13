@@ -6,15 +6,23 @@ HOURS ?= 2
 
 all: lint test fuzz
 
+waf_engine fuzz-waf_engine fuzz-stress-waf_engine: EXTRA_FUZZ_FLAGS = -dict=dicts/waf.dict
+waf_rule_engine fuzz-waf_rule_engine fuzz-stress-waf_rule_engine: EXTRA_FUZZ_FLAGS = -dict=dicts/waf.dict
+detect_mime fuzz-detect_mime fuzz-stress-detect_mime: EXTRA_FUZZ_FLAGS = -dict=dicts/detect_mime.dict
+form_captcha fuzz-form_captcha fuzz-stress-form_captcha: EXTRA_FUZZ_FLAGS = -dict=dicts/form_captcha.dict
+hs_setconf fuzz-hs_setconf fuzz-stress-hs_setconf: EXTRA_FUZZ_FLAGS = -dict=dicts/hs_setconf.dict
+proxy_protocol fuzz-proxy_protocol fuzz-stress-proxy_protocol: EXTRA_FUZZ_FLAGS = -dict=dicts/proxy_protocol.dict
+session_security fuzz-session_security fuzz-stress-session_security: EXTRA_FUZZ_FLAGS = -dict=dicts/session_security.dict
+
 $(FUZZ_TARGETS):
-	cd fuzz && cargo +nightly fuzz run $@ -- $(FUZZ_FLAGS)
+	cd fuzz && cargo +nightly fuzz run $@ -- $(FUZZ_FLAGS) $(EXTRA_FUZZ_FLAGS)
 
 fuzz: fuzz-all
 
 fuzz-all: $(FUZZ_TARGETS)
 
 $(addprefix fuzz-,$(FUZZ_TARGETS)): fuzz-%:
-	cd fuzz && cargo +nightly fuzz run $* -- $(FUZZ_FLAGS)
+	cd fuzz && cargo +nightly fuzz run $* -- $(FUZZ_FLAGS) $(EXTRA_FUZZ_FLAGS)
 
 fuzz-stress-all:
 	@STRESS_SEC=$$(($(HOURS) * 3600)); \
@@ -31,7 +39,7 @@ $(addprefix fuzz-cmin-,$(FUZZ_TARGETS)): fuzz-cmin-%:
 
 $(addprefix fuzz-stress-,$(FUZZ_TARGETS)): fuzz-stress-%:
 	@STRESS_SEC=$$(($(HOURS) * 3600)); \
-	cd fuzz && cargo +nightly fuzz run $* -- -max_total_time=$$STRESS_SEC
+	cd fuzz && cargo +nightly fuzz run $* -- -max_total_time=$$STRESS_SEC $(EXTRA_FUZZ_FLAGS)
 
 fuzz-lint:
 	cd fuzz && cargo clippy --all-features --all-targets -- -D clippy::pedantic -D clippy::nursery -D clippy::all

@@ -13,20 +13,20 @@ Specific advisories are ignored in `deny.toml` as the vulnerable code paths are 
 ## Fuzzing Status
 Core logic is continuously stressed using `cargo-fuzz` (libFuzzer) to ensure memory safety and zero panics.
 
-- **Corpus**: 9276 seeds (37M, minimized)
+- **Corpus**: 9257 seeds (37M, minimized)
 - **Crashes Found**: 0
-- **Last Updated**: 2026-03-04
+- **Last Updated**: 2026-03-13
 
 ### Statistics
 | Target | Coverage | Features | Corpus |
 |--------|----------|----------|--------|
-| `form_captcha` | 1123 | 3483 | 542/117Kb |
-| `proxy_protocol` | 334 | 515 | 131/6221b |
-| `session_security` | 1238 | 3667 | 302/38Kb |
-| `waf_engine` | 7280 | 41506 | 6942/1214Kb |
+| `form_captcha` | 1123 | 3484 | 540/115Kb |
+| `proxy_protocol` | 355 | 541 | 136/6352b |
+| `session_security` | 1238 | 3667 | 301/38Kb |
+| `waf_engine` | 7289 | 41494 | 6947/1215Kb |
 | `detect_mime` | 81 | 120 | 51/1748b |
-| `waf_rule_engine` | 1408 | 6886 | 671/115Kb |
-| `hs_setconf` | 291 | 1458 | 433/109Kb |
+| `waf_rule_engine` | 1414 | 6925 | 682/143Kb |
+| `hs_setconf` | 291 | 1458 | 428/105Kb |
 
 ### Target Descriptions
 - `form_captcha`: Custom `application/x-www-form-urlencoded` parser (`src/core/proxy/response.rs`) for extracting CAPTCHA tokens and solutions (`s`, `solution`, `c1-c6`).
