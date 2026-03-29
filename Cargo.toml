@@ -20,6 +20,11 @@ testing = []
 name = "gaunter"
 path = "src/lib.rs"
 
+[[bench]]
+name = "benchmarks"
+harness = false
+required-features = ["testing"]
+
 [dependencies]
 ab_glyph = { version = "0.2.32", default-features = false, features = ["std"] }
 aho-corasick = { version = "1.1.4", default-features = false, features = ["std", "perf-literal"] }
@@ -33,7 +38,7 @@ chacha20poly1305 = "0.10.1"
 dotenvy = "0.15.7"
 httparse = { version = "1.10.1", default-features = false, features = ["std"] }
 
-image = { version = "0.25.9", default-features = false, features = ["webp", "png", "jpeg"] }
+image = { version = "0.25.10", default-features = false, features = ["webp", "png", "jpeg"] }
 imageproc = { version = "0.26.1", default-features = false, features = ["text"] }
 libinjectionrs = "0.1.1"
 papaya = "0.2.3"
@@ -47,14 +52,14 @@ regex = { version = "1.12.3", default-features = false, features = ["std", "perf
 reqwest = { version = "0.13.2", default-features = false, features = ["json", "rustls"] }
 serde = { version = "1.0.228", default-features = false, features = ["derive", "std"] }
 serde_json = { version = "1.0.149", default-features = false, features = ["std"] }
-sha2 = "0.10.9"
-socket2 = "0.6.2"
-stem-rs = "1.2.2"
+sha2 = "0.11.0"
+socket2 = "0.6.3"
+stem-rs = "1.2.3"
 thiserror = "2.0.18"
 tokio = { version = "1.50.0", features = ["rt-multi-thread", "net", "io-util", "time", "sync", "macros"] }
 tracing = "0.1.44"
 tracing-appender = "0.2.4"
-tracing-subscriber = { version = "0.3.22", default-features = false, features = ["env-filter", "json", "fmt", "ansi"] }
+tracing-subscriber = { version = "0.3.23", default-features = false, features = ["env-filter", "json", "fmt", "ansi"] }
 url = { version = "2.5.8", default-features = false, features = ["std"] }
 
 [dev-dependencies]
@@ -69,8 +74,3 @@ lto = true
 codegen-units = 1
 panic = "abort"
 strip = true
-
-[[bench]]
-name = "benchmarks"
-harness = false
-required-features = ["testing"]

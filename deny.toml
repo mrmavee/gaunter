@@ -21,7 +21,6 @@ allow = [
     "ISC",
     "BSD-3-Clause",
     "BSD-2-Clause",
-    "OpenSSL",
     "Zlib",
     "Unicode-3.0",
     "AGPL-3.0-only",
