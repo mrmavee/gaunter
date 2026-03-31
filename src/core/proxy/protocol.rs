@@ -14,6 +14,30 @@ use tracing::{debug, error, info, trace, warn};
 
 use crate::error::{Error, Result};
 
+fn extract_i2p_destination(buf: &[u8]) -> Option<String> {
+    let mut needle = b"x-i2p-desthash:".as_slice();
+    let mut haystack = buf
+        .windows(needle.len())
+        .position(|w| w.eq_ignore_ascii_case(needle));
+
+    if haystack.is_none() {
+        needle = b"x-i2p-destb64:".as_slice();
+        haystack = buf
+            .windows(needle.len())
+            .position(|w| w.eq_ignore_ascii_case(needle));
+    }
+
+    let pos = haystack?;
+    let value_start = pos + needle.len();
+    let rest = buf.get(value_start..)?;
+    let end = rest.iter().position(|&b| b == b'\r' || b == b'\n')?;
+    let raw = std::str::from_utf8(rest.get(..end)?).ok()?.trim();
+    if raw.is_empty() {
+        return None;
+    }
+    Some(super::headers::i2p_destination_id(raw))
+}
+
 fn extract_circuit(ip: &std::net::IpAddr, prefix: &str) -> Option<String> {
     match ip {
         std::net::IpAddr::V6(v6) => {
@@ -166,7 +190,7 @@ async fn handle_connection(
 ) -> std::io::Result<()> {
     configure_tcp_stream(client);
 
-    let mut buf = [0u8; 512];
+    let mut buf = [0u8; 4096];
     let n = client.peek(&mut buf).await?;
 
     if n == 0 {
@@ -196,6 +220,18 @@ async fn handle_connection(
             .is_some_and(|m| m.is_circuit_banned(cid))
     {
         warn!(circuit = %cid, action = "circuit_ban", "connection refused: circuit banned");
+        return Ok(());
+    }
+
+    if circuit_id.is_none()
+        && let Some(peeked) = buf.get(..n)
+        && let Some(i2p_dest) = extract_i2p_destination(peeked)
+        && config
+            .defense_monitor
+            .as_ref()
+            .is_some_and(|m| m.is_circuit_banned(&i2p_dest))
+    {
+        warn!(dest = %i2p_dest, action = "dest_ban", "connection refused: i2p dest banned");
         return Ok(());
     }
 
@@ -605,5 +641,32 @@ mod tests {
         r4.parse(b"GET / HTTP/1.1\r\nTransfer-Encoding: chunked\r\n\r\n")
             .unwrap();
         assert!(build_headers(&r4, None).is_err());
+    }
+
+    #[test]
+    fn i2p_destination_extraction() {
+        let valid = b"GET / HTTP/1.1\r\nHost: site.i2p\r\nX-I2P-DestHash: abc123hash\r\n\r\n";
+        let result = extract_i2p_destination(valid);
+        assert!(result.is_some());
+        assert!(result.as_ref().unwrap().starts_with("i2p:"));
+
+        let valid_b64 = b"GET / HTTP/1.1\r\nHost: site.i2p\r\nX-I2P-DestB64: longb64string\r\n\r\n";
+        assert!(extract_i2p_destination(valid_b64).is_some());
+
+        let mixed_case = b"GET / HTTP/1.1\r\nHost: site.i2p\r\nX-i2p-DESTHASH: abc123hash\r\n\r\n";
+        assert!(extract_i2p_destination(mixed_case).is_some());
+
+        let missing = b"GET / HTTP/1.1\r\nHost: site.i2p\r\n\r\n";
+        assert!(extract_i2p_destination(missing).is_none());
+
+        let empty_value = b"GET / HTTP/1.1\r\nX-I2P-DestHash: \r\n\r\n";
+        assert!(extract_i2p_destination(empty_value).is_none());
+
+        let truncated = b"GET / HTTP/1.1\r\nX-I2P-DestHash:";
+        assert!(extract_i2p_destination(truncated).is_none());
+
+        let first = extract_i2p_destination(valid).unwrap();
+        let second = extract_i2p_destination(valid).unwrap();
+        assert_eq!(first, second);
     }
 }

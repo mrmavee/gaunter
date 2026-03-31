@@ -23,7 +23,7 @@ pub mod error;
 #[allow(missing_docs)]
 pub mod test_helpers {
     pub use crate::core::middleware::EncryptedSession;
-    pub use crate::core::proxy::headers::is_static_asset;
+    pub use crate::core::proxy::headers::{i2p_destination_id, is_static_asset};
     pub use crate::core::proxy::protocol::parse_proxy_header;
     pub use crate::core::proxy::response::parse_form;
     pub use crate::features::tor::control::hs_setconf;

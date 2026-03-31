@@ -60,6 +60,35 @@ async fn circuit_ban_karma() {
 }
 
 #[tokio::test]
+async fn dest_ban_karma() {
+    let _config = base_config();
+    let backend = spawn_mock_backend();
+    let (proxy_addr, defense) = spawn_stack(&backend);
+
+    let raw_hash = "i2p_destination_hash";
+    let unified_cid = gaunter::test_helpers::i2p_destination_id(raw_hash);
+    defense.add_karma(&unified_cid, 300);
+
+    let mut stream = timeout(Duration::from_secs(5), TcpStream::connect(&proxy_addr))
+        .await
+        .unwrap()
+        .unwrap();
+
+    let req = format!("GET / HTTP/1.1\r\nHost: gaunter\r\nX-I2P-DestHash: {raw_hash}\r\n\r\n");
+    stream.write_all(req.as_bytes()).await.unwrap();
+
+    let mut buf = [0u8; 1024];
+    let res = timeout(Duration::from_secs(5), stream.read(&mut buf))
+        .await
+        .unwrap();
+
+    match res {
+        Ok(n) => assert_eq!(n, 0),
+        Err(e) => assert_eq!(e.kind(), std::io::ErrorKind::ConnectionReset),
+    }
+}
+
+#[tokio::test]
 async fn compress_gzip() {
     let _config = base_config();
     let backend = spawn_mock_backend();

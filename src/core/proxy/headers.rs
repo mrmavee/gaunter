@@ -12,7 +12,8 @@ static I2P_COUNTER: AtomicU64 = AtomicU64::new(1);
 static I2P_DEST_MAP: std::sync::LazyLock<papaya::HashMap<String, u64>> =
     std::sync::LazyLock::new(papaya::HashMap::new);
 
-fn i2p_circuit_id(dest: &str) -> String {
+/// Generates or retrieves sequential I2P destination identifier.
+pub fn i2p_destination_id(dest: &str) -> String {
     let map = I2P_DEST_MAP.pin();
     let id = map.get(dest).map_or_else(
         || {
@@ -115,7 +116,7 @@ pub fn extract_circuit_id(session: &Session) -> Option<String> {
         .get("x-i2p-desthash")
         .or_else(|| headers.get("x-i2p-destb64"))
         .and_then(|v| v.to_str().ok())
-        .map(i2p_circuit_id)
+        .map(i2p_destination_id)
 }
 
 /// Checks if the request URI points to a static asset.
