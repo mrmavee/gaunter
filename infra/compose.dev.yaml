@@ -25,6 +25,10 @@ services:
       - SETGID
     depends_on:
       - mock_backend
+    dns:
+      - 1.1.1.1
+    ports:
+      - "127.0.0.1:7072:7070"
 
   mock_backend:
     build:

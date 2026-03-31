@@ -6,6 +6,24 @@ use crate::config::Config;
 use pingora::Result;
 use pingora::http::ResponseHeader;
 use pingora::proxy::Session;
+use std::sync::atomic::{AtomicU64, Ordering};
+
+static I2P_COUNTER: AtomicU64 = AtomicU64::new(1);
+static I2P_DEST_MAP: std::sync::LazyLock<papaya::HashMap<String, u64>> =
+    std::sync::LazyLock::new(papaya::HashMap::new);
+
+fn i2p_circuit_id(dest: &str) -> String {
+    let map = I2P_DEST_MAP.pin();
+    let id = map.get(dest).map_or_else(
+        || {
+            let new_id = I2P_COUNTER.fetch_add(1, Ordering::Relaxed);
+            map.insert(dest.to_string(), new_id);
+            new_id
+        },
+        |existing| *existing,
+    );
+    format!("i2p:{id}")
+}
 
 pub fn inject_security_headers(
     upstream_response: &mut ResponseHeader,
@@ -91,12 +109,13 @@ pub fn extract_circuit_id(session: &Session) -> Option<String> {
         return cid;
     }
 
-    session
-        .req_header()
-        .headers
-        .get("x-i2p-destb64")
+    let headers = &session.req_header().headers;
+
+    headers
+        .get("x-i2p-desthash")
+        .or_else(|| headers.get("x-i2p-destb64"))
         .and_then(|v| v.to_str().ok())
-        .map(|s| format!("i2p:{s}"))
+        .map(i2p_circuit_id)
 }
 
 /// Checks if the request URI points to a static asset.
