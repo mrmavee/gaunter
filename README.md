@@ -212,10 +212,10 @@ cosign verify --key cosign.pub mrmave/gaunter:latest
 You can download the latest release from the [Releases Page](https://git.mrmave.work/maverick/gaunter/releases/latest).
 
 ```bash
-# Example for v0.1.0
-wget https://git.mrmave.work/maverick/gaunter/releases/download/v0.1.0/gaunter-v0.1.0-linux-amd64
-wget https://git.mrmave.work/maverick/gaunter/releases/download/v0.1.0/gaunter-v0.1.0-linux-amd64.sha256
-wget https://git.mrmave.work/maverick/gaunter/releases/download/v0.1.0/gaunter-v0.1.0-linux-amd64.asc
+# Example for v0.3.0
+wget https://git.mrmave.work/maverick/gaunter/releases/download/v0.3.0/gaunter-v0.3.0-linux-amd64
+wget https://git.mrmave.work/maverick/gaunter/releases/download/v0.3.0/gaunter-v0.3.0-linux-amd64.sha256
+wget https://git.mrmave.work/maverick/gaunter/releases/download/v0.3.0/gaunter-v0.3.0-linux-amd64.asc
 
 # Verify using WKD (Web Key Directory)
 gpg --locate-keys mail@mrmave.work
@@ -224,8 +224,8 @@ gpg --locate-keys mail@mrmave.work
 wget https://git.mrmave.work/maverick/gaunter/raw/branch/main/certs/maverick.asc
 gpg --import maverick.asc
 
-sha256sum -c gaunter-v0.1.0-linux-amd64.sha256
-gpg --verify gaunter-v0.1.0-linux-amd64.asc gaunter-v0.1.0-linux-amd64
+sha256sum -c gaunter-v0.3.0-linux-amd64.sha256
+gpg --verify gaunter-v0.3.0-linux-amd64.asc gaunter-v0.3.0-linux-amd64
 ```
 
 ## Limitations
