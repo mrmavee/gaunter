@@ -56,7 +56,7 @@ fn extract_circuit(ip: &std::net::IpAddr, prefix: &str) -> Option<String> {
     }
 }
 
-/// Parses PROXY v2 header.
+/// Parses PROXY protocol header.
 #[cfg(any(fuzzing, feature = "fuzzing", feature = "testing"))]
 #[must_use]
 pub fn parse_proxy_header(buf: &[u8], prefix: &str) -> Option<(usize, SocketAddr, Option<String>)> {
