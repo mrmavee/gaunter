@@ -2,8 +2,9 @@
 
 [![Build Status](https://git.mrmave.work/maverick/gaunter/actions/workflows/ci.yml/badge.svg)](https://git.mrmave.work/maverick/gaunter/actions)
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
-[![Rust Version](https://img.shields.io/badge/rust-1.92%2B-orange)](https://www.rust-lang.org/)
-[![Docker](https://img.shields.io/docker/v/mrmave/gaunter?sort=semver)](https://hub.docker.com/r/mrmave/gaunter)
+[![Rust Version](https://img.shields.io/badge/rust-1.92%2B-blue)](https://www.rust-lang.org/)
+[![Docker](https://img.shields.io/docker/v/mrmave/gaunter?color=blue&sort=semver)](https://hub.docker.com/r/mrmave/gaunter)
+[![Docker Pulls](https://img.shields.io/docker/pulls/mrmave/gaunter?color=blue)](https://hub.docker.com/r/mrmave/gaunter)
 [![Coverage](https://git.mrmave.work/maverick/gaunter/raw/branch/badges/coverage.svg)](https://git.mrmave.work/maverick/gaunter)
 
 <br />
