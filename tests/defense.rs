@@ -91,7 +91,7 @@ async fn auto_defense_escalation() {
     let proxy = spawn_proxy_server(&backend);
     let client = Client::new();
 
-    for i in 0..15 {
+    for i in 0..50 {
         let _ = client
             .get(format!("http://{proxy}/"))
             .header("X-Circuit-ID", format!("tor:circuit_{i:04x}"))

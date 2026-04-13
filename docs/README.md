@@ -90,10 +90,10 @@ Gaunter features an adaptive scoring system that triggers defensive actions base
 
 | Variable | Description | Default |
 |:---|:---|:---|
-| `ATTACK_CHURN_THRESHOLD` | Threshold for circuit creation rate (churn) | `30` |
-| `ATTACK_RPS_THRESHOLD` | Threshold for global requests per second | `30` |
+| `ATTACK_CHURN_THRESHOLD` | Threshold for circuit creation rate (churn) | `80` |
+| `ATTACK_RPS_THRESHOLD` | Threshold for global requests per second | `60` |
 | `ATTACK_RPC_THRESHOLD` | Threshold for average requests per circuit | `5` |
-| `ATTACK_DEFENSE_SCORE` | Attack score to auto-enable Defense Mode (CAPTCHA) | `2.0` |
+| `ATTACK_DEFENSE_SCORE` | Attack score to auto-enable Defense Mode (CAPTCHA) | `2.5` |
 | `ATTACK_POW_SCORE` | Attack score to auto-enable Tor Proof-of-Work (PoW) | `4.0` |
 | `ATTACK_POW_EFFORT` | Tor PoW effort level when activated | `5` |
 | `ATTACK_RECOVERY_SECS` | Seconds of low attack score before auto-recovery | `300` |
