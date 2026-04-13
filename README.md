@@ -86,6 +86,8 @@ graph LR
 |-----------|------------|
 | Core Framework | [Pingora](https://github.com/cloudflare/pingora) |
 | Runtime | [Tokio](https://tokio.rs) |
+| Tor Daemon | [Tor](https://www.torproject.org/) `v0.4.9.x` |
+| i2pd Daemon | [i2pd](https://i2pd.website/) `v2.59.x` |
 | Control Protocol | [stem-rs](https://crates.io/crates/stem-rs) |
 | WAF Detection | [libinjection](https://github.com/libinjection/libinjection), Aho-Corasick, RegexSet |
 | Session Encryption | XChaCha20-Poly1305 |
