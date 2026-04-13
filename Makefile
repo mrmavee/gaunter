@@ -48,10 +48,10 @@ deny:
 	cargo deny check
 
 test:
-	cargo nextest run --all-features --all-targets
+	cargo nextest run --all-features --lib --tests
 
 cov:
-	cargo llvm-cov nextest --all-features --all-targets
+	cargo llvm-cov nextest --all-features --lib --tests
 
 bench:
 	cargo bench --features testing
