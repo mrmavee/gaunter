@@ -167,7 +167,7 @@ fn configure_tcp_stream(stream: &TcpStream) {
     let _ = stream.set_nodelay(true);
 
     let mut ka = socket2::TcpKeepalive::new()
-        .with_time(std::time::Duration::from_secs(60))
+        .with_time(std::time::Duration::from_mins(1))
         .with_interval(std::time::Duration::from_secs(10));
 
     #[cfg(not(target_os = "openbsd"))]
@@ -179,7 +179,7 @@ fn configure_tcp_stream(stream: &TcpStream) {
 
     #[cfg(target_os = "linux")]
     {
-        let _ = sock.set_tcp_user_timeout(Some(std::time::Duration::from_millis(10000)));
+        let _ = sock.set_tcp_user_timeout(Some(std::time::Duration::from_secs(10)));
     }
 }
 

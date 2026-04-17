@@ -62,7 +62,7 @@ fn spawn_background(
         });
 
         rt.spawn(async move {
-            let mut interval = tokio::time::interval(std::time::Duration::from_secs(60));
+            let mut interval = tokio::time::interval(std::time::Duration::from_mins(1));
             loop {
                 interval.tick().await;
                 defense_monitor_bg.tick();
