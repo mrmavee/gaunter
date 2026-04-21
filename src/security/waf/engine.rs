@@ -203,6 +203,10 @@ impl WafEngine {
     }
 
     fn is_dangerous(&self, input: &str) -> bool {
+        if !input.contains(':') {
+            return false;
+        }
+
         let Ok(parsed_url) = url::Url::parse(input) else {
             return false;
         };

@@ -105,7 +105,7 @@ impl RuleEngine {
     /// Evaluates input fields against WAF rules.
     #[must_use]
     pub fn eval(&self, path: &str, query: &str, body: &str, cookie: &str) -> EvalResult {
-        let mut scores: HashMap<String, u32> = HashMap::new();
+        let mut local_scores: HashMap<&str, u32> = HashMap::new();
         let mut matched_rules = Vec::new();
 
         let path_dec = percent_decode_str(path).decode_utf8_lossy();
@@ -141,7 +141,7 @@ impl RuleEngine {
                         trace!(id = rule.id, "rule match: literal");
                     }
                     for (cat, score) in &rule.scores {
-                        *scores.entry(cat.clone()).or_default() += *score;
+                        *local_scores.entry(cat.as_str()).or_default() += *score;
                     }
                 }
             }
@@ -157,10 +157,15 @@ impl RuleEngine {
                         trace!(id = rule.id, "rule match: regex");
                     }
                     for (cat, score) in &rule.scores {
-                        *scores.entry(cat.clone()).or_default() += *score;
+                        *local_scores.entry(cat.as_str()).or_default() += *score;
                     }
                 }
             }
+        }
+
+        let mut scores: HashMap<String, u32> = HashMap::new();
+        for (k, v) in local_scores {
+            scores.insert(k.to_string(), v);
         }
 
         let blocked = scores.values().any(|&s| s >= BLOCK_SCORE)
