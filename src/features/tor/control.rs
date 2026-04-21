@@ -146,7 +146,8 @@ fn hs_setconf_inner(
         ));
     }
 
-    let mut parts: Vec<String> = Vec::new();
+    let mut out = String::with_capacity(torrc.len() + 128);
+    out.push_str("SETCONF");
 
     for block in &blocks {
         let is_pow_block = block.iter().any(|&(k, _)| {
@@ -160,36 +161,50 @@ fn hs_setconf_inner(
             if key == "HiddenServicePoWQueueRate" && is_pow_block {
                 has_rate = true;
                 if let Some(rate) = rate_override {
-                    parts.push(format!("HiddenServicePoWQueueRate={rate}"));
+                    out.push_str(" HiddenServicePoWQueueRate=");
+                    out.push_str(&rate.to_string());
                     continue;
                 }
             }
             if key == "HiddenServicePoWQueueBurst" && is_pow_block {
                 has_burst = true;
                 if let Some(burst) = burst_override {
-                    parts.push(format!("HiddenServicePoWQueueBurst={burst}"));
+                    out.push_str(" HiddenServicePoWQueueBurst=");
+                    out.push_str(&burst.to_string());
                     continue;
                 }
             }
+
+            out.push(' ');
+            out.push_str(key);
+            out.push('=');
             if val.contains(' ') {
-                let escaped = val.replace('\\', "\\\\").replace('"', "\\\"");
-                parts.push(format!("{key}=\"{escaped}\""));
+                out.push('"');
+                for c in val.chars() {
+                    if c == '\\' || c == '"' {
+                        out.push('\\');
+                    }
+                    out.push(c);
+                }
+                out.push('"');
             } else {
-                parts.push(format!("{key}={val}"));
+                out.push_str(val);
             }
         }
 
         if is_pow_block {
             if let (false, Some(rate)) = (has_rate, rate_override) {
-                parts.push(format!("HiddenServicePoWQueueRate={rate}"));
+                out.push_str(" HiddenServicePoWQueueRate=");
+                out.push_str(&rate.to_string());
             }
             if let (false, Some(burst)) = (has_burst, burst_override) {
-                parts.push(format!("HiddenServicePoWQueueBurst={burst}"));
+                out.push_str(" HiddenServicePoWQueueBurst=");
+                out.push_str(&burst.to_string());
             }
         }
     }
 
-    Ok(format!("SETCONF {}", parts.join(" ")))
+    Ok(out)
 }
 
 #[cfg(test)]

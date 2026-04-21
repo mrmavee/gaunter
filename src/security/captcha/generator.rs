@@ -154,7 +154,12 @@ impl CaptchaGenerator {
         self.cookie_crypto.try_encrypt(payload.as_bytes())
     }
 
-    fn draw_rotated_char(&self, img: &mut RgbImage, params: &CharDrawParams) {
+    fn draw_rotated_char(
+        &self,
+        img: &mut RgbImage,
+        params: &CharDrawParams,
+        offsets: &[(f32, f32)],
+    ) {
         let scratch_size = f32_to_u32(params.size * 2.0);
         let mut scratch: RgbImage =
             ImageBuffer::from_pixel(scratch_size, scratch_size, Rgb([26, 30, 35]));
@@ -179,8 +184,8 @@ impl CaptchaGenerator {
         );
 
         let half_scratch = i32::try_from(scratch_size / 2).unwrap_or(0);
-        let params_x = f32_to_i32(params.x);
-        let params_y = f32_to_i32(params.y);
+        let params_x = params.x;
+        let params_y = params.y;
 
         let (width, height) = img.dimensions();
         let width_i32 = i32::try_from(width).unwrap_or(160);
@@ -190,13 +195,17 @@ impl CaptchaGenerator {
             if pixel[0] > 30 || pixel[1] > 35 || pixel[2] > 40 {
                 let pixel_x = i32::try_from(rx).unwrap_or(0);
                 let pixel_y = i32::try_from(ry).unwrap_or(0);
-                let gx = params_x + pixel_x - half_scratch;
-                let gy = params_y + pixel_y - half_scratch;
-                if (0..width_i32).contains(&gx)
-                    && (0..height_i32).contains(&gy)
-                    && let (Ok(gx_u32), Ok(gy_u32)) = (u32::try_from(gx), u32::try_from(gy))
-                {
-                    img.put_pixel(gx_u32, gy_u32, *pixel);
+
+                for &(off_x, off_y) in offsets {
+                    let gx = f32_to_i32(params_x + off_x) + pixel_x - half_scratch;
+                    let gy = f32_to_i32(params_y + off_y) + pixel_y - half_scratch;
+
+                    if (0..width_i32).contains(&gx)
+                        && (0..height_i32).contains(&gy)
+                        && let (Ok(gx_u32), Ok(gy_u32)) = (u32::try_from(gx), u32::try_from(gy))
+                    {
+                        img.put_pixel(gx_u32, gy_u32, *pixel);
+                    }
                 }
             }
         }
@@ -336,7 +345,7 @@ impl CaptchaGenerator {
                     .choose(rng)
                     .ok_or_else(|| Error::Captcha("Line colors empty".to_string()))?,
             };
-            self.draw_rotated_char(img, &params);
+            self.draw_rotated_char(img, &params, &[(0.0, 0.0)]);
         }
         Ok(())
     }
@@ -389,16 +398,7 @@ impl CaptchaGenerator {
                     rotation_deg: rotation,
                     color,
                 };
-                self.draw_rotated_char(img, &params);
-                let params2 = CharDrawParams {
-                    ch,
-                    x: x_buffer + 1.0,
-                    y: y_pos,
-                    size: font_size,
-                    rotation_deg: rotation,
-                    color,
-                };
-                self.draw_rotated_char(img, &params2);
+                self.draw_rotated_char(img, &params, &[(0.0, 0.0), (1.0, 0.0)]);
 
                 char_map.push((ch.to_string(), x_buffer, y_pos, rotation));
             }
