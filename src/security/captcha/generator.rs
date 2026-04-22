@@ -44,10 +44,14 @@ struct ArcParams {
     color: Rgb<u8>,
 }
 
+/// CAPTCHA difficulty levels.
 #[derive(Clone, Copy)]
 pub enum Difficulty {
+    /// Easy.
     Easy,
+    /// Medium.
     Medium,
+    /// Hard.
     Hard,
 }
 

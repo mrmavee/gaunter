@@ -1,6 +1,7 @@
 use criterion::{Criterion, criterion_group, criterion_main};
 use gaunter::test_helpers::{
-    CookieCrypto, EncryptedSession, RuleEngine, detect_safe_mime, parse_form, parse_proxy_header,
+    CaptchaGenerator, CookieCrypto, Difficulty, EncryptedSession, RuleEngine, detect_safe_mime,
+    hs_setconf, parse_form, parse_proxy_header,
 };
 use gaunter::{Config, WafEngine, WebhookNotifier};
 use std::hint::black_box;
@@ -136,6 +137,33 @@ fn bench_proxy_protocol(c: &mut Criterion) {
     });
 }
 
+fn bench_hs_setconf(c: &mut Criterion) {
+    let torrc = "\
+HiddenServiceDir /var/lib/tor/hs_a/
+HiddenServicePort 80 127.0.0.1:8080
+HiddenServicePoWDefensesEnabled 1
+HiddenServicePoWQueueRate 50
+HiddenServicePoWQueueBurst 100
+HiddenServiceEnableIntroDoSDefense 1
+HiddenServiceMaxStreams 20
+
+HiddenServiceDir /var/lib/tor/hs_b/
+HiddenServicePort 80 127.0.0.1:7777
+";
+
+    c.bench_function("hs_setconf_build", |b| {
+        b.iter(|| hs_setconf(black_box(torrc), black_box(Some(10)), black_box(Some(20))));
+    });
+}
+
+fn bench_captcha_generator(c: &mut Criterion) {
+    let generator = CaptchaGenerator::try_new("secret-key", 300, Difficulty::Medium).expect("ok");
+
+    c.bench_function("captcha_generate_medium", |b| {
+        b.iter(|| generator.generate());
+    });
+}
+
 criterion_group!(
     benches,
     bench_waf_engine,
@@ -145,5 +173,7 @@ criterion_group!(
     bench_signatures,
     bench_response_parsing,
     bench_proxy_protocol,
+    bench_hs_setconf,
+    bench_captcha_generator,
 );
 criterion_main!(benches);
