@@ -1113,7 +1113,7 @@ dependencies = [
 
 [[package]]
 name = "gaunter"
-version = "1.0.1"
+version = "1.0.2"
 dependencies = [
  "ab_glyph",
  "aho-corasick",
