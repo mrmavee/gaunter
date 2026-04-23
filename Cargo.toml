@@ -58,7 +58,7 @@ stem-rs = "1.2.3"
 thiserror = "2.0.18"
 tokio = { version = "1.52.1", features = ["rt-multi-thread", "net", "io-util", "time", "sync", "macros"] }
 tracing = "0.1.44"
-tracing-appender = "0.2.4"
+tracing-appender = "0.2.5"
 tracing-subscriber = { version = "0.3.23", default-features = false, features = ["env-filter", "json", "fmt", "ansi"] }
 url = { version = "2.5.8", default-features = false, features = ["std"] }
 
