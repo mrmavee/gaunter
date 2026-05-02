@@ -1,6 +1,6 @@
 [package]
 name = "gaunter"
-version = "1.0.2"
+version = "1.0.3"
 build = "build.rs"
 edition = "2024"
 description = "Hidden Service Reverse Proxy & Web Application Firewall"
