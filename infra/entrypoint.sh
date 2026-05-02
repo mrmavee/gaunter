@@ -97,6 +97,8 @@ if [ "$I2P_ENABLED" = "true" ]; then
     truncate -s 0 $I2P_LOG
     chown i2pd:i2pd $I2P_LOG
     
+
+
     echo "[entrypoint] Starting i2pd..."
     su-exec i2pd sh -c "i2pd --conf=/etc/i2pd/i2pd.conf --tunconf=/etc/i2pd/tunnels.conf --datadir=/var/lib/i2pd > $I2P_LOG 2>&1" &
     I2P_PID=$!
@@ -133,6 +135,13 @@ if [ "$I2P_ENABLED" = "true" ]; then
     else
         echo "[entrypoint] WARNING: i2pd initialization timeout! Check logs."
     fi
+fi
+
+TOR_VERSION=$(tor --version | head -n 1 | awk '{print $3}' | sed 's/\.$//')
+export TOR_VERSION
+if [ "$I2P_ENABLED" = "true" ]; then
+    I2P_VERSION=$(i2pd --version | head -n 1 | awk '{print $3}')
+    export I2P_VERSION
 fi
 
 echo "[entrypoint] Starting Gaunter..."

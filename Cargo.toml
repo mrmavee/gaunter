@@ -1,6 +1,7 @@
 [package]
 name = "gaunter"
 version = "1.0.2"
+build = "build.rs"
 edition = "2024"
 description = "Hidden Service Reverse Proxy & Web Application Firewall"
 repository = "https://git.mrmave.work/maverick/gaunter"

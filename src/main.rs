@@ -118,8 +118,10 @@ fn print_startup(config: &gaunter::Config) {
         } else {
             "disabled"
         };
-
     let unspecified = config.network.listen_addr.ip().is_unspecified();
+    let pingora_v = env!("PINGORA_VERSION");
+    let tor_v = std::env::var("TOR_VERSION").unwrap_or_else(|_| "unknown".to_string());
+    let i2p_v = std::env::var("I2P_VERSION").unwrap_or_else(|_| "unknown".to_string());
 
     println!("{sep}");
     println!("  {app_name}");
@@ -142,6 +144,7 @@ fn print_startup(config: &gaunter::Config) {
     println!("  tor       {tor}");
     println!("  i2p       {i2p}");
     println!("  webhook   {webhook}");
+    println!("  versions  pingora:v{pingora_v}  tor:v{tor_v}  i2p:v{i2p_v}");
     println!("{sep}");
 }
 
