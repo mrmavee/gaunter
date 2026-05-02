@@ -72,6 +72,7 @@ if [ $bootstrapped -eq 0 ]; then
 fi
 
 kill "$TAIL_PID" 2>/dev/null || true
+wait "$TAIL_PID" 2>/dev/null || true
 
 I2P_PID=""
 if [ "$I2P_ENABLED" = "true" ]; then
@@ -92,18 +93,45 @@ if [ "$I2P_ENABLED" = "true" ]; then
         echo "[entrypoint] Certificates restored."
     fi
     
-    touch $I2P_LOG
+
+    truncate -s 0 $I2P_LOG
     chown i2pd:i2pd $I2P_LOG
     
     echo "[entrypoint] Starting i2pd..."
     su-exec i2pd sh -c "i2pd --conf=/etc/i2pd/i2pd.conf --tunconf=/etc/i2pd/tunnels.conf --datadir=/var/lib/i2pd > $I2P_LOG 2>&1" &
     I2P_PID=$!
     
-    sleep 3
-    if kill -0 "$I2P_PID" 2>/dev/null; then
-        echo "[entrypoint] i2pd started successfully!"
+    tail -f $I2P_LOG | awk '!/NetDb|SSU2|NTCP2|Profiling/ { print $0; fflush() }' &
+    I2P_TAIL_PID=$!
+
+    echo "[entrypoint] Waiting for i2pd to start..."
+    while ! grep -q "i2pd v.* starting" $I2P_LOG; do
+        sleep 0.5
+    done
+
+    echo "[entrypoint] Waiting for i2pd initialization..."
+    i2p_timeout=180
+    i2p_count=0
+    i2p_ready=0
+
+    while [ $i2p_count -lt $i2p_timeout ]; do
+        if grep -q "I2P server tunnels created" $I2P_LOG && \
+           grep -qE "Tunnel: .* tunnel .* has been created" $I2P_LOG; then
+            i2p_ready=1
+            break
+        fi
+        sleep 1
+        i2p_count=$((i2p_count+1))
+    done
+
+    sleep 1
+    kill "$I2P_TAIL_PID" 2>/dev/null || true
+    wait "$I2P_TAIL_PID" 2>/dev/null || true
+
+    if [ $i2p_ready -eq 1 ]; then
+        echo "[entrypoint] i2pd initialization complete!"
     else
-        echo "[entrypoint] WARNING: i2pd failed to start! Check logs."
+        echo "[entrypoint] WARNING: i2pd initialization timeout! Check logs."
     fi
 fi
 
@@ -113,4 +141,12 @@ GAUNTER_PID=$!
 
 wait_pids="$GAUNTER_PID $TOR_PID"
 [ -n "$I2P_PID" ] && wait_pids="$wait_pids $I2P_PID"
-wait $wait_pids
+while true; do
+    for pid in $wait_pids; do
+        if ! kill -0 "$pid" 2>/dev/null; then
+            echo "[entrypoint] Process $pid exited. Shutting down..."
+            _term
+        fi
+    done
+    sleep 2
+done
