@@ -29,7 +29,7 @@ required-features = ["testing"]
 [dependencies]
 ab_glyph = { version = "0.2.32", default-features = false, features = ["std"] }
 aho-corasick = { version = "1.1.4", default-features = false, features = ["std", "perf-literal"] }
-async-compression = { version = "0.4.41", features = ["tokio", "gzip", "brotli"] }
+async-compression = { version = "0.4.42", features = ["tokio", "gzip", "brotli"] }
 async-trait = "0.1.89"
 async_chunked_transfer = "1.4.0"
 base64 = { version = "0.22.1", default-features = false, features = ["std", "alloc"] }
@@ -40,7 +40,7 @@ dotenvy = "0.15.7"
 httparse = { version = "1.10.1", default-features = false, features = ["std"] }
 
 image = { version = "0.25.10", default-features = false, features = ["webp", "png", "jpeg"] }
-imageproc = { version = "0.26.1", default-features = false, features = ["text"] }
+imageproc = { version = "0.26.2", default-features = false, features = ["text"] }
 libinjectionrs = "0.1.1"
 papaya = "0.2.4"
 path-clean = "1.0.1"
@@ -50,7 +50,7 @@ pingora-limits = "0.8.0"
 proxy-header = "0.1.2"
 rand = "0.10.1"
 regex = { version = "1.12.3", default-features = false, features = ["std", "perf", "unicode-perl", "unicode-case"] }
-reqwest = { version = "0.13.2", default-features = false, features = ["json", "rustls"] }
+reqwest = { version = "0.13.3", default-features = false, features = ["json", "rustls"] }
 serde = { version = "1.0.228", default-features = false, features = ["derive", "std"] }
 serde_json = { version = "1.0.149", default-features = false, features = ["std"] }
 sha2 = "0.11.0"
