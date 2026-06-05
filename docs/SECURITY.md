@@ -8,7 +8,6 @@ Specific advisories are ignored in `deny.toml` as the vulnerable code paths are 
 | **RUSTSEC-2024-0437** | `protobuf` | DoS via stack overflow in `skip_group`. Unreachable as Gaunter does not expose metrics endpoints and the L4 proxy only handles HTTP/1.x, never parsing Protobuf messages. |
 | **RUSTSEC-2025-0069** | `daemonize` | Informational (unmaintained). Gaunter runs Pingora in the foreground via `Server::run_forever()` in `src/main.rs`; daemonization is never initialized. |
 | **RUSTSEC-2024-0388** | `derivative` | Informational (unmaintained). Procedural macro used by `pingora-core` at compile-time only; no runtime footprint. |
-| **RUSTSEC-2024-0436** | `paste` | Informational (unmaintained). Procedural macro used by `imageproc` at compile-time only; no runtime footprint. |
 
 ## Fuzzing Status
 Core logic is continuously stressed using `cargo-fuzz` (libFuzzer) to ensure memory safety and zero panics.
