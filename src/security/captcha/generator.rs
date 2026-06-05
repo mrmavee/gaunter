@@ -6,7 +6,7 @@ use ab_glyph::{FontRef, PxScale};
 use base64::{Engine, engine::general_purpose::STANDARD};
 use image::{ImageBuffer, Rgb, RgbImage};
 use imageproc::drawing::{draw_antialiased_line_segment_mut, draw_text_mut};
-use imageproc::geometric_transformations::{Interpolation, rotate_about_center};
+use imageproc::geometric_transformations::{Border, Interpolation, rotate_about_center};
 use imageproc::pixelops::interpolate;
 use rand::prelude::{IndexedMutRandom, IndexedRandom};
 use rand::{Rng, RngExt};
@@ -184,7 +184,7 @@ impl CaptchaGenerator {
             &scratch,
             angle_rad,
             Interpolation::Bilinear,
-            Rgb([26, 30, 35]),
+            Border::Constant(Rgb([26, 30, 35])),
         );
 
         let half_scratch = i32::try_from(scratch_size / 2).unwrap_or(0);
