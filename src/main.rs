@@ -144,7 +144,11 @@ fn print_startup(config: &gaunter::Config) {
     println!("  tor       {tor}");
     println!("  i2p       {i2p}");
     println!("  webhook   {webhook}");
-    println!("  versions  pingora:v{pingora_v}  tor:v{tor_v}  i2p:v{i2p_v}");
+    if i2p == "enabled" {
+        println!("  versions  pingora:v{pingora_v}  tor:v{tor_v}  i2p:v{i2p_v}");
+    } else {
+        println!("  versions  pingora:v{pingora_v}  tor:v{tor_v}");
+    }
     println!("{sep}");
 }
 

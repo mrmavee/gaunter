@@ -2,3 +2,4 @@
 /tor_keys
 **/*.env*
 i2p_keys/
+.wakatime-project
