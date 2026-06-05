@@ -40,7 +40,7 @@ dotenvy = "0.15.7"
 httparse = { version = "1.10.1", default-features = false, features = ["std"] }
 
 image = { version = "0.25.10", default-features = false, features = ["webp", "png", "jpeg"] }
-imageproc = { version = "0.26.2", default-features = false, features = ["text"] }
+imageproc = { version = "0.27.0", default-features = false, features = ["text"] }
 libinjectionrs = "0.1.1"
 papaya = "0.2.4"
 path-clean = "1.0.1"
