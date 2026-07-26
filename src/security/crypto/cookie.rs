@@ -3,9 +3,9 @@
 //! Implements secure session storage using XChaCha20-Poly1305.
 
 use base64::{Engine as _, engine::general_purpose::URL_SAFE_NO_PAD};
-use chacha20poly1305::aead::rand_core::RngCore;
-use chacha20poly1305::aead::{Aead, KeyInit, OsRng};
+use chacha20poly1305::aead::{Aead, KeyInit};
 use chacha20poly1305::{Key, XChaCha20Poly1305, XNonce};
+use rand::RngExt;
 use sha2::{Digest, Sha256};
 
 use crate::error::{Error, Result};
@@ -30,7 +30,7 @@ impl CookieCrypto {
         master_key.copy_from_slice(&result);
 
         Self {
-            cipher: XChaCha20Poly1305::new(Key::from_slice(&master_key)),
+            cipher: XChaCha20Poly1305::new(&Key::from(master_key)),
         }
     }
 
@@ -39,13 +39,12 @@ impl CookieCrypto {
     /// # Errors
     /// Returns an error if XChaCha20-Poly1305 encryption fails.
     pub fn try_encrypt(&self, plaintext: &[u8]) -> Result<String> {
-        let mut nonce_bytes = [0u8; NONCE_LEN];
-        OsRng.fill_bytes(&mut nonce_bytes);
-        let nonce = XNonce::from_slice(&nonce_bytes);
+        let nonce_bytes: [u8; NONCE_LEN] = rand::rng().random();
+        let nonce = XNonce::from(nonce_bytes);
 
         let ciphertext = self
             .cipher
-            .encrypt(nonce, plaintext)
+            .encrypt(&nonce, plaintext)
             .map_err(|_| Error::Crypto("XChaCha20-Poly1305 encryption failed".to_string()))?;
 
         let mut combined = Vec::with_capacity(NONCE_LEN + ciphertext.len());
@@ -67,9 +66,9 @@ impl CookieCrypto {
         let nonce_slice = combined.get(0..NONCE_LEN)?;
         let ciphertext = combined.get(NONCE_LEN..)?;
 
-        let nonce = XNonce::from_slice(nonce_slice);
+        let nonce = XNonce::try_from(nonce_slice).ok()?;
 
-        self.cipher.decrypt(nonce, ciphertext).ok()
+        self.cipher.decrypt(&nonce, ciphertext).ok()
     }
 }
 
