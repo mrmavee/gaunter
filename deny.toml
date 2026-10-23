@@ -8,8 +8,7 @@ feature-depth = 1
 
 [advisories]
 ignore = [
-    { id = "RUSTSEC-2024-0437", reason = "transitive dependency via pingora -> prometheus; metrics endpoint is not used/exposed" },
-    { id = "RUSTSEC-2025-0069", reason = "transitive dependency of pingora (daemonize is unmaintained)" },
+    { id = "RUSTSEC-2024-0449", reason = "transitive dependency of pingora (unsafe-libyaml is unmaintained)" },
     { id = "RUSTSEC-2024-0388", reason = "transitive dependency of pingora (derivative is unmaintained)" },
     { id = "RUSTSEC-2026-0192", reason = "transitive dependency of ab_glyph and imageproc (ttf-parser is unmaintained)" },
 ]
@@ -25,6 +24,7 @@ allow = [
     "Unicode-3.0",
     "AGPL-3.0-only",
     "CDLA-Permissive-2.0",
+    "CC0-1.0",
 ]
 confidence-threshold = 0.8
 
@@ -39,3 +39,4 @@ external-default-features = "allow"
 unknown-registry = "warn"
 unknown-git = "warn"
 allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+
