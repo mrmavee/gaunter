@@ -269,7 +269,7 @@ mod tests {
         let res = render_template("Hello {{NAME}}!", &[("NAME", "World")]);
         assert_eq!(res, "Hello World!");
 
-        assert!(render_template("", &[("key", "val")]).is_empty());
+        assert_eq!(render_template("", &[("key", "val")]), "");
 
         let c = cfg();
 

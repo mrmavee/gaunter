@@ -174,12 +174,12 @@ mod tests {
         assert_eq!(answer, "hello world");
 
         let (token, answer) = parse_form(b"");
-        assert!(token.is_empty());
-        assert!(answer.is_empty());
+        assert_eq!(token, "");
+        assert_eq!(answer, "");
 
         let (token, answer) = parse_form(b"invalid_data&no_equals&===&");
-        assert!(token.is_empty());
-        assert!(answer.is_empty());
+        assert_eq!(token, "");
+        assert_eq!(answer, "");
 
         let (token, answer) = parse_form(b"s=token_val&c1=X");
         assert_eq!(token, "token_val");

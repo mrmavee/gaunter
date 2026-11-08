@@ -140,8 +140,8 @@ mod tests {
         let mgr = CaptchaManager::try_new(&cfg()).unwrap();
 
         let (tok, img, _) = mgr.generate().unwrap();
-        assert!(!tok.is_empty());
-        assert!(!img.is_empty());
+        assert_ne!(tok, "");
+        assert_ne!(img, "");
 
         assert!(!mgr.verify(&tok, "mismatch"));
 

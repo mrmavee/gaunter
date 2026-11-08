@@ -497,7 +497,7 @@ mod tests {
 
         let g = CaptchaGenerator::try_new("hard-secret", 300, Difficulty::Hard).unwrap();
         let (passcode, img, positions) = g.generate().unwrap();
-        assert!(!passcode.is_empty());
+        assert_ne!(passcode, "");
         assert!(img.starts_with("data:image/webp;base64,"));
         assert!(!positions.is_empty());
         let tok = g.create_token(&passcode).unwrap();
